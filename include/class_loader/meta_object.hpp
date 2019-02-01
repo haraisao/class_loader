@@ -60,66 +60,78 @@ public:
   /**
    * @brief Constructor for the class
    */
+  CLASS_LOADER_PUBLIC
   AbstractMetaObjectBase(const std::string & class_name, const std::string & base_class_name);
   /**
    * @brief Destructor for the class. THIS MUST NOT BE VIRTUAL AND OVERRIDDEN BY
    * TEMPLATE SUBCLASSES, OTHERWISE THEY WILL PULL IN A REDUNDANT METAOBJECT
    * DESTRUCTOR OUTSIDE OF libclass_loader WITHIN THE PLUGIN LIBRARY! T
    */
+  CLASS_LOADER_PUBLIC
   ~AbstractMetaObjectBase();
 
   /**
    * @brief Gets the literal name of the class.
    * @return The literal name of the class as a C-string.
    */
+  CLASS_LOADER_PUBLIC
   std::string className() const;
 
   /**
    * @brief gets the base class for the class this factory represents
    */
+  CLASS_LOADER_PUBLIC
   std::string baseClassName() const;
   /**
    * @brief Gets the name of the class as typeid(BASE_CLASS).name() would return it
    */
+  CLASS_LOADER_PUBLIC
   std::string typeidBaseClassName() const;
 
   /**
    * @brief Gets the path to the library associated with this factory
    * @return Library path as a std::string
    */
+  CLASS_LOADER_PUBLIC
   std::string getAssociatedLibraryPath();
 
   /**
    * @brief Sets the path to the library associated with this factory
    */
+  CLASS_LOADER_PUBLIC
   void setAssociatedLibraryPath(std::string library_path);
 
   /**
    * @brief Associates a ClassLoader owner with this factory,
    * @param loader Handle to the owning ClassLoader.
    */
+  CLASS_LOADER_PUBLIC
   void addOwningClassLoader(ClassLoader * loader);
 
   /**
    * @brief Removes a ClassLoader that is an owner of this factory
    * @param loader Handle to the owning ClassLoader.
    */
+  CLASS_LOADER_PUBLIC
   void removeOwningClassLoader(const ClassLoader * loader);
 
   /**
    * @brief Indicates if the factory is within the usable scope of a ClassLoader
    * @param loader Handle to the owning ClassLoader.
    */
+  CLASS_LOADER_PUBLIC
   bool isOwnedBy(const ClassLoader * loader);
 
   /**
    * @brief Indicates if the factory is within the usable scope of any ClassLoader
    */
+  CLASS_LOADER_PUBLIC
   bool isOwnedByAnybody();
 
   /**
    * A vector of class loaders that own this metaobject
    */
+  CLASS_LOADER_PUBLIC
   ClassLoaderVector getAssociatedClassLoaders();
 
 protected:

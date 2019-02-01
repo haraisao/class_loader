@@ -53,7 +53,15 @@ std::string systemLibraryPrefix()
 
 std::string systemLibrarySuffix()
 {
+#ifdef WIN32
+#if defined(_DEBUG)
+	return "d.dll";
+#else
+	return ".dll";
+#endif
+#else
   return Poco::SharedLibrary::suffix();
+#endif
 }
 
 

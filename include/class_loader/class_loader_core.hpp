@@ -69,7 +69,11 @@ typedef std::string ClassName;
 typedef std::string BaseClassName;
 typedef std::map<ClassName, impl::AbstractMetaObjectBase *> FactoryMap;
 typedef std::map<BaseClassName, FactoryMap> BaseToFactoryMapMap;
+#if WIN32
+typedef std::pair<LibraryPath, void *> LibraryPair;
+#else
 typedef std::pair<LibraryPath, Poco::SharedLibrary *> LibraryPair;
+#endif
 typedef std::vector<LibraryPair> LibraryVector;
 typedef std::vector<AbstractMetaObjectBase *> MetaObjectVector;
 

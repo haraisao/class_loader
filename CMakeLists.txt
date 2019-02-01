@@ -9,28 +9,39 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-find_package(Boost REQUIRED COMPONENTS thread system)
 
 set(CATKIN_DISABLED false CACHE BOOL "Disable the catkin build, useful if catkin is present but a build outside of ros is done")
 if(NOT CATKIN_DISABLED)
   find_package(catkin QUIET)
 endif()
 
+find_package(Boost REQUIRED COMPONENTS thread system)
 find_package(console_bridge REQUIRED)
 
 if(${catkin_FOUND})
   find_package(catkin REQUIRED COMPONENTS cmake_modules)
-  find_package(Poco REQUIRED COMPONENTS Foundation)
-  catkin_package(
+  if(NOT WIN32)
+    find_package(Poco REQUIRED COMPONENTS Foundation)
+    catkin_package(
+      INCLUDE_DIRS include
+      LIBRARIES ${PROJECT_NAME} ${Poco_LIBRARIES}
+      DEPENDS Boost Poco console_bridge
+      CFG_EXTRAS class_loader-extras.cmake
+    )
+  else()
+    catkin_package(
     INCLUDE_DIRS include
-    LIBRARIES ${PROJECT_NAME} ${Poco_LIBRARIES}
-    DEPENDS Boost Poco console_bridge
+    LIBRARIES ${PROJECT_NAME}
+    DEPENDS Boost console_bridge
     CFG_EXTRAS class_loader-extras.cmake
   )
+  endif()
 else()
   message("-- catkin not found")
-  set(Poco_DIR cmake)
-  find_package(Poco REQUIRED COMPONENTS Foundation)
+  if(NOT WIN32)
+    set(Poco_DIR cmake)
+    find_package(Poco REQUIRED COMPONENTS Foundation)
+  endif()
   set(CATKIN_GLOBAL_BIN_DESTINATION bin)
   set(CATKIN_GLOBAL_LIB_DESTINATION lib)
   set(CATKIN_GLOBAL_LIBEXEC_DESTINATION lib)
@@ -40,7 +51,11 @@ else()
   set(CATKIN_PACKAGE_INCLUDE_DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/${PROJECT_NAME})
 endif()
 
-include_directories(include ${console_bridge_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${Poco_INCLUDE_DIRS})
+if(WIN32)
+  include_directories(include ${console_bridge_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} )
+else()
+  include_directories(include ${console_bridge_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${Poco_INCLUDE_DIRS})
+endif()
 
 set(${PROJECT_NAME}_SRCS
   src/class_loader.cpp
@@ -57,7 +72,11 @@ set(${PROJECT_NAME}_HDRS
   include/class_loader/register_macro.hpp
 )
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SRCS} ${${PROJECT_NAME}_HDRS})
-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${console_bridge_LIBRARIES} ${Poco_LIBRARIES})
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${console_bridge_LIBRARIES})
+else()
+    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${console_bridge_LIBRARIES} ${Poco_LIBRARIES})
+endif()
 if(WIN32)
   # Causes the visibility macros to use dllexport rather than dllimport
   # which is appropriate when building the dll but not consuming it.
@@ -80,12 +99,18 @@ endif()
 
 if(NOT catkin_FOUND)
   set(TARGET_NAME ${PROJECT_NAME})
-  set(PKGCONFIG_LIBS
+  if(WIN32)
+    set(PKGCONFIG_LIBS
     ${Boost_LIBRARIES}
     ${console_bridge_LIBRARIES}
-    ${Poco_LIBRARIES}
-  )
-
+    )
+  else()
+    set(PKGCONFIG_LIBS
+      ${Boost_LIBRARIES}
+      ${console_bridge_LIBRARIES}
+      ${Poco_LIBRARIES}
+    )
+  endif()
   # Prepare and install necessary files to support finding of the library
   # using pkg-config
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/${TARGET_NAME}.pc.in
