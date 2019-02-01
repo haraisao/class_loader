@@ -31,7 +31,9 @@
 
 #include <string>
 
+#ifndef WIN32
 #include "Poco/SharedLibrary.h"
+#endif
 
 namespace class_loader
 {

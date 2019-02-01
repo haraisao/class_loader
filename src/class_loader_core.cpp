@@ -32,12 +32,15 @@
 
 #ifndef WIN32
 #include <Poco/SharedLibrary.h>
+#else
+#include <windows.h>
 #endif
 
 #include <cassert>
 #include <cstddef>
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace class_loader
 {

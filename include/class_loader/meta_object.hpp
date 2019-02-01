@@ -40,6 +40,8 @@
 #include <string>
 #include <vector>
 
+#include "class_loader/visibility_control.hpp"
+
 namespace class_loader
 {
 
