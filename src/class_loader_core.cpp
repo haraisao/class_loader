@@ -299,7 +299,11 @@ bool isLibraryLoadedByAnybody(const std::string & library_path)
   LibraryVector::iterator itr = findLoadedLibrary(library_path);
 
   if (itr != open_libraries.end()) {
+#ifdef WIN32
+    assert(itr->second != NULL);
+#else
     assert(itr->second->isLoaded() == true);  // Ensure Poco actually thinks the library is loaded
+#endif
     return true;
   } else {
     return false;
