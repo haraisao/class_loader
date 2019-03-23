@@ -434,6 +434,21 @@ void purgeGraveyardOfMetaobjects(
   }
 }
 
+#ifdef WIN32
+void * load_win_dll(const std::string & library_path)
+{
+  void *library_handle;
+	DWORD flags(0);
+
+	library_handle = LoadLibraryExA(library_path.c_str(), 0, flags);
+  if (library_handle == NULL){
+    std::cerr << "Fail to loadLibrary:" << GetLastError() << std::endl;
+    library_handle = nullptr;
+  }
+  return library_handle;
+}
+#endif
+
 void loadLibrary(const std::string & library_path, ClassLoader * loader)
 {
   static boost::recursive_mutex loader_mutex;
@@ -462,12 +477,7 @@ void loadLibrary(const std::string & library_path, ClassLoader * loader)
       setCurrentlyActiveClassLoader(loader);
       setCurrentlyLoadingLibraryName(library_path);
 #ifdef WIN32
-	    DWORD flags(0);
-	    library_handle = LoadLibraryExA(library_path.c_str(), 0, flags);
-      if (library_handle == NULL){
-        std::cerr << "Fail to loadLibrary:" << GetLastError() << std::endl;
-        library_handle = nullptr;
-      }
+      library_handle=load_win_dll(library_path);
 #else
       library_handle = new Poco::SharedLibrary(library_path);
 #endif
